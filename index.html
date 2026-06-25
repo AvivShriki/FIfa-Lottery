@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>הגרלת פיפא</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Heebo', sans-serif; background: #1a1408; color: #fff; min-height: 100vh; direction: rtl; padding-bottom: 3rem; }
+
+    .header { text-align: center; padding: 1.5rem 1.25rem 1rem; border-bottom: 1px solid rgba(212,175,55,0.2); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .header-title { font-size: 26px; font-weight: 700; color: #d4af37; letter-spacing: 1px; }
+
+    .section { padding: 1.25rem 1.25rem 0; }
+    .sec-label { font-size: 13px; color: rgba(212,175,55,0.7); font-weight: 500; letter-spacing: 0.08em; margin-bottom: 12px; }
+
+    .add-row { display: flex; gap: 10px; align-items: flex-end; }
+    .add-row input {
+      flex: 1; background: transparent; border: none;
+      border-bottom: 1px solid rgba(212,175,55,0.35);
+      color: #fff; font-size: 16px; font-family: 'Heebo', sans-serif;
+      padding: 8px 0; outline: none; direction: rtl;
+    }
+    .add-row input::placeholder { color: rgba(255,255,255,0.4); }
+    .add-row input:focus { border-bottom-color: #d4af37; }
+    .btn-add { width: 44px; height: 44px; flex-shrink: 0; background: #d4af37; border: none; border-radius: 10px; color: #1a1408; font-size: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-add:active { opacity: 0.75; }
+
+    .plist { display: flex; flex-direction: column; gap: 2px; margin-top: 1rem; }
+    .pitem { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .pitem-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.3); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .pitem-check.on { background: #d4af37; border-color: #d4af37; }
+    .pitem-check.on::after { content: ''; width: 7px; height: 7px; background: #1a1408; border-radius: 50%; display: block; }
+    .pitem-namerow { display: inline-flex; align-items: center; gap: 8px; }
+    .pitem-name { font-size: 16px; color: rgba(255,255,255,0.5); font-weight: 400; }
+    .pitem.active .pitem-name { color: #fff; font-weight: 500; }
+    .pitem-del { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); background: transparent; cursor: pointer; color: rgba(255,255,255,0.35); font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pitem-del:active { border-color: #ff6b6b; color: #ff6b6b; }
+
+    .counter-bar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem 0; }
+    .counter-txt { font-size: 13px; color: rgba(255,255,255,0.3); }
+    .counter-num { font-size: 22px; font-weight: 700; color: #d4af37; }
+
+    .divider { height: 1px; background: rgba(212,175,55,0.15); margin: 1.25rem 1.25rem 0; }
+
+    .draw-section { padding: 1.25rem 1.25rem 0; }
+    .btn-draw { width: 100%; height: 60px; background: transparent; border: 1px solid rgba(212,175,55,0.4); border-radius: 14px; color: rgba(255,255,255,0.85); font-size: 17px; font-weight: 500; font-family: 'Heebo', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .btn-draw:not(:disabled):active { opacity: 0.8; background: rgba(212,175,55,0.08); }
+    .btn-draw:disabled { opacity: 0.25; cursor: not-allowed; }
+
+    .results-section { padding: 1rem 1.25rem 0; display: flex; flex-direction: column; gap: 14px; }
+
+    .match-block { border: 1px solid rgba(212,175,55,0.25); border-radius: 16px; overflow: hidden; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .match-block-header { padding: 10px 16px; background: rgba(212,175,55,0.1); border-bottom: 1px solid rgba(212,175,55,0.15); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #d4af37; text-transform: uppercase; }
+    .match-body { padding: 20px 16px; }
+    .match-team-row { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .team-names { display: flex; gap: 8px; align-items: center; }
+    .team-name { font-size: 26px; font-weight: 700; color: #fff; }
+    .team-sep { font-size: 20px; color: #fff; font-weight: 300; }
+    .vs-badge { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #1a1408; background: #d4af37; padding: 5px 14px; border-radius: 20px; flex-shrink: 0; }
+
+    .pending-block { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; animation: slideIn 0.3s ease; }
+    .pending-block-header { padding: 10px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .pending-body { padding: 20px 16px; }
+    .pending-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+    .solo-block { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; animation: slideIn 0.3s ease; }
+    .solo-block-header { padding: 10px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .solo-body { padding: 20px 16px; text-align: center; }
+    .solo-name { font-size: 26px; font-weight: 700; color: #fff; }
+    .solo-subtitle { font-size: 30px; font-weight: 700; color: #d4af37; margin-top: 10px; }
+
+    .btn-reset { width: calc(100% - 2.5rem); margin: 1rem 1.25rem 0; height: 44px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: rgba(255,255,255,0.3); font-size: 15px; cursor: pointer; font-family: 'Heebo', sans-serif; }
+    .btn-reset:active { border-color: rgba(212,175,55,0.3); color: rgba(212,175,55,0.6); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <svg width="80" height="48" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="8" width="56" height="28" rx="14" fill="#1a1a2e" stroke="#d4af37" stroke-width="1.5"/>
+      <rect x="1" y="14" width="10" height="16" rx="5" fill="#1a1a2e" stroke="#d4af37" stroke-width="1.2"/>
+      <rect x="61" y="14" width="10" height="16" rx="5" fill="#1a1a2e" stroke="#d4af37" stroke-width="1.2"/>
+      <circle cx="20" cy="22" r="5.5" fill="none" stroke="#d4af37" stroke-width="1.2"/>
+      <line x1="20" y1="16.5" x2="20" y2="27.5" stroke="#d4af37" stroke-width="1.2"/>
+      <line x1="14.5" y1="22" x2="25.5" y2="22" stroke="#d4af37" stroke-width="1.2"/>
+      <circle cx="52" cy="19" r="2" fill="#0070cc"/>
+      <circle cx="57" cy="22" r="2" fill="#e2193a"/>
+      <circle cx="47" cy="22" r="2" fill="#56a0d3"/>
+      <circle cx="52" cy="25" r="2" fill="#c8a800"/>
+      <rect x="31" y="18" width="3" height="8" rx="1.5" fill="#d4af37" opacity="0.6"/>
+      <rect x="28.5" y="20.5" width="8" height="3" rx="1.5" fill="#d4af37" opacity="0.6"/>
+    </svg>
+    <div class="header-title">הגרלת פיפא</div>
+  </div>
+
+  <div class="section">
+    <p class="sec-label">הוסף שחקן</p>
+    <div class="add-row">
+      <input type="text" id="nameInput" placeholder="שם החבר..."/>
+      <button class="btn-add" id="addBtn">+</button>
+    </div>
+  </div>
+
+  <div style="padding: 0 1.25rem; margin-top: 1.25rem;">
+    <p class="sec-label">מי נוכח היום?</p>
+    <div class="plist" id="plist"></div>
+  </div>
+
+  <div class="counter-bar">
+    <span class="counter-txt">שחקנים נוכחים</span>
+    <span class="counter-num" id="counter">0</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="draw-section">
+    <button class="btn-draw" id="drawBtn" disabled>
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="16" fill="#fff"/>
+        <path d="M18 3.5 L15 10 L18 12 L21 10 Z" fill="#111"/>
+        <path d="M28.5 11 L23.5 11 L22 15 L25 18.5 L30 16.5 Z" fill="#111"/>
+        <path d="M26.5 26 L22.5 22.5 L19 24 L18.5 28.5 L23 31 Z" fill="#111"/>
+        <path d="M9.5 26 L13.5 22.5 L13 18.5 L9.5 17.5 L5.5 21.5 Z" fill="#111"/>
+        <path d="M7.5 11 L12 11.5 L14 15 L13 18.5 L9.5 17.5 L5.5 14 Z" fill="#111"/>
+        <circle cx="18" cy="18" r="16" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+      </svg>
+      הגרל
+    </button>
+  </div>
+
+  <div class="results-section" id="results"></div>
+  <button class="btn-reset" id="resetBtn" style="display:none">התחל הגרלה מחדש</button>
+
+  <script>
+    var players = JSON.parse(localStorage.getItem('fifa_players') || '[]');
+    var queue = [], blockIndex = 0, matchCount = 0, pendingCount = 0;
+    var matchLabels = ['משחקים ראשונים','משחקים שניים','משחקים שלישיים','משחקים רביעיים','משחקים חמישיים'];
+    var pendingLabels = ['ממתינים ראשונים','ממתינים שניים','ממתינים שלישיים'];
+
+    function save() { localStorage.setItem('fifa_players', JSON.stringify(players)); }
+    function getActive() { return players.filter(function(p) { return p.active; }); }
+
+    function render() {
+      var list = document.getElementById('plist');
+      list.innerHTML = '';
+      players.forEach(function(p, i) {
+        var div = document.createElement('div');
+        div.className = 'pitem' + (p.active ? ' active' : '');
+        var chk = document.createElement('div');
+        chk.className = 'pitem-check' + (p.active ? ' on' : '');
+        chk.onclick = function() { players[i].active = !players[i].active; save(); render(); };
+        var namerow = document.createElement('div');
+        namerow.className = 'pitem-namerow';
+        var name = document.createElement('span');
+        name.className = 'pitem-name';
+        name.textContent = p.name;
+        var del = document.createElement('button');
+        del.className = 'pitem-del';
+        del.textContent = '✕';
+        del.onclick = function() { players.splice(i, 1); save(); render(); };
+        namerow.appendChild(name); namerow.appendChild(del);
+        div.appendChild(chk); div.appendChild(namerow);
+        list.appendChild(div);
+      });
+      var activeCount = getActive().length;
+      document.getElementById('counter').textContent = activeCount;
+      var btn = document.getElementById('drawBtn');
+      btn.disabled = queue.length === 0 ? activeCount < 2 : blockIndex * 4 >= queue.length;
+    }
+
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length-1; i > 0; i--) { var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+      return a;
+    }
+
+    function th(name, dim) {
+      return '<span class="team-name"' + (dim ? ' style="opacity:0.6"' : '') + '>' + name + '</span>';
+    }
+
+    document.getElementById('addBtn').onclick = function() {
+      var input = document.getElementById('nameInput');
+      var name = input.value.trim();
+      if (!name) return;
+      players.push({name: name, active: true});
+      save(); input.value = ''; input.focus(); render();
+    };
+
+    document.getElementById('nameInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('addBtn').click();
+    });
+
+    document.getElementById('drawBtn').onclick = function() {
+      if (queue.length === 0) {
+        queue = shuffle(getActive().map(function(p) { return p.name; }));
+        blockIndex = 0; matchCount = 0; pendingCount = 0;
+        document.getElementById('results').innerHTML = '';
+        document.getElementById('resetBtn').style.display = 'none';
+      }
+      var pos = blockIndex * 4;
+      if (pos >= queue.length) return;
+      var s = queue.slice(pos, pos + 4);
+      blockIndex++;
+
+      if (s.length === 1) {
+        var b = document.createElement('div');
+        b.className = 'solo-block';
+        b.innerHTML = '<div class="solo-block-header">ממתין</div><div class="solo-body"><div class="solo-name">' + s[0] + '</div><div class="solo-subtitle">אווו את הפלי 😬</div></div>';
+        document.getElementById('results').appendChild(b);
+      } else if (s.length >= 4) {
+        var isMatch = matchCount < 2;
+        var label = isMatch ? (matchLabels[matchCount] || 'משחק') : (pendingLabels[pendingCount] || 'ממתינים');
+        if (isMatch) matchCount++; else pendingCount++;
+        var dim = !isMatch;
+        var block = document.createElement('div');
+        block.className = isMatch ? 'match-block' : 'pending-block';
+        var vsBadge = isMatch
+          ? '<div class="vs-badge">נגד</div>'
+          : '<div class="vs-badge" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)">נגד</div>';
+        var headerClass = isMatch ? 'match-block-header' : 'pending-block-header';
+        var bodyClass = isMatch ? 'match-body' : 'pending-body';
+        var rowClass = isMatch ? 'match-team-row' : 'pending-row';
+        block.innerHTML =
+          '<div class="' + headerClass + '">' + label + '</div>' +
+          '<div class="' + bodyClass + '"><div class="' + rowClass + '">' +
+            '<div class="team-names">' + th(s[0],dim) + '<span class="team-sep">&</span>' + th(s[1],dim) + '</div>' +
+            vsBadge +
+            '<div class="team-names">' + th(s[2],dim) + '<span class="team-sep">&</span>' + th(s[3],dim) + '</div>' +
+          '</div></div>';
+        document.getElementById('results').appendChild(block);
+      } else {
+        var isM = matchCount < 2;
+        var lbl = isM ? (matchLabels[matchCount] || 'משחק') : (pendingLabels[pendingCount] || 'ממתינים');
+        if (isM) matchCount++; else pendingCount++;
+        var bl = document.createElement('div');
+        bl.className = isM ? 'match-block' : 'pending-block';
+        var names = s.map(function(n) { return th(n, !isM); }).join('<span class="team-sep"> & </span>');
+        bl.innerHTML = '<div class="' + (isM?'match-block-header':'pending-block-header') + '">' + lbl + '</div><div class="' + (isM?'match-body':'pending-body') + '"><div class="' + (isM?'match-team-row':'pending-row') + '">' + names + '</div></div>';
+        document.getElementById('results').appendChild(bl);
+      }
+
+      if (blockIndex * 4 >= queue.length) document.getElementById('resetBtn').style.display = 'block';
+      render();
+    };
+
+    document.getElementById('resetBtn').onclick = function() {
+      queue = []; blockIndex = 0; matchCount = 0; pendingCount = 0;
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('resetBtn').style.display = 'none';
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>
