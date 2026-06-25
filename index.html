@@ -229,6 +229,8 @@ function getPlayerData(name) { return PLAYER_DB[name] || {name:name,nick:"",img:
       var input = document.getElementById("nameInput");
       var name = input.value.trim();
       if (!name) return;
+      var exists = players.some(function(p) { return p.name === name; });
+      if (exists) { alert("ימושחת! אי אפשר להוסיף את אותו משתמש פעמיים"); return; }
       players.push({name: name, active: true});
       save(); input.value = ""; input.focus(); render();
     };
