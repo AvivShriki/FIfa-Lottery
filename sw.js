@@ -1,7 +1,10 @@
-const CACHE = 'fifa-lottery-v1';
+const CACHE = 'fifa-lottery-v2';
 const ASSETS = [
   '/FIfa-Lottery/',
-  '/FIfa-Lottery/index.html'
+  '/FIfa-Lottery/index.html',
+  '/FIfa-Lottery/style.css',
+  '/FIfa-Lottery/app.js',
+  '/FIfa-Lottery/players.js'
 ];
 
 self.addEventListener('install', function(e) {
