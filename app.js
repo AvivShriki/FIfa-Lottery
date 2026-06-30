@@ -97,7 +97,7 @@ function getPlayerData(name) { return PLAYER_DB[name] || {name:name,nick:"",img:
             '<div class="match-block-header">' + label + '</div>' +
             '<div class="match-body"><div class="team-vs-row">' +
               '<div class="team-side">' + leftHTML + '</div>' +
-              '<div class="vs-col"><div class="vs-badge">נגד</div></div>' +
+              '<div class="vs-col"><div class="vs-line"></div><div class="vs-badge">VS</div><div class="vs-line"></div></div>' +
               '<div class="team-side">' + rightHTML + '</div>' +
             '</div></div>';
           el.appendChild(blockEl);
@@ -123,7 +123,8 @@ function getPlayerData(name) { return PLAYER_DB[name] || {name:name,nick:"",img:
         var del = document.createElement("button");
         del.className = "pitem-del";
         del.textContent = "✕";
-        del.onclick = function() { players.splice(i,1); save(); render(); };
+        del.onclick = function(e) { e.stopPropagation(); players.splice(i,1); save(); render(); };
+        div.onclick = function() { players[i].active = !players[i].active; save(); render(); };
         div.innerHTML = av;
         div.appendChild(chk);
         div.appendChild(namerow);
@@ -593,6 +594,31 @@ function getPlayerData(name) { return PLAYER_DB[name] || {name:name,nick:"",img:
       var allNames = _statsPlayers.slice();
       // Sort by wins desc
       allNames.sort(function(a,b) { return (_sessionWins[b]||0) - (_sessionWins[a]||0); });
+
+      // ===== PODIUM (top 3) =====
+      if (allNames.length >= 2) {
+        var podiumOrder = [allNames[1], allNames[0], allNames[2]];
+        var podiumClasses = ['silver', 'gold', 'bronze'];
+        var podiumEmojis = ['\u{1F948}', '\u{1F947}', '\u{1F949}'];
+        var podiumHTML = '<div class="lb-podium">';
+        podiumOrder.forEach(function(name, pi) {
+          if (!name) { podiumHTML += '<div style="width:78px"></div>'; return; }
+          var pd = getPlayerData(name);
+          var cls = podiumClasses[pi];
+          var emoji = podiumEmojis[pi];
+          var wins = _sessionWins[name] || 0;
+          var av = pd.img
+            ? '<img class="lb-podium-avatar ' + cls + '" src="' + pd.img + '"/>'
+            : '<div class="lb-podium-avatar-ph ' + cls + '">👤</div>';
+          podiumHTML += '<div class="lb-podium-item">' + av +
+            '<div class="lb-podium-name">' + escapeHtml(pd.name || name) + '</div>' +
+            '<div class="lb-podium-wins">' + wins + ' נצחונות</div>' +
+            '<div class="lb-podium-base ' + cls + '">' + emoji + '</div></div>';
+        });
+        podiumHTML += '</div>';
+        lb.innerHTML = podiumHTML;
+      }
+
       var rank = 1;
       allNames.forEach(function(name, idx) {
         var pd = getPlayerData(name);
