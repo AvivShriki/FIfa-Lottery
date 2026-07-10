@@ -1,4 +1,4 @@
-const CACHE = 'fifa-lottery-v3';
+const CACHE = 'fifa-lottery-v4';
 const ASSETS = [
   '/FIfa-Lottery/',
   '/FIfa-Lottery/index.html',
